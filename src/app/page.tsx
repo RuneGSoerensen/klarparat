@@ -1,103 +1,81 @@
-import Image from "next/image";
+import { Calendar1, MessageSquare, Image, ChevronLeft, ChevronRight, Cookie } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Header */}
+      <header className="p-4">
+        <div className="flex items-center gap-2">
+          <Cookie className="w-6 h-6 text-[#C4A484]" />
+          <h1 className="text-xl font-semibold">KlarParat</h1>
+        </div>
+        <div className="flex items-center gap-2 mt-4">
+          <Calendar1 className="w-5 h-5 text-[#C4A484]" />
+          <h2 className="text-lg">Kalender</h2>
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Calendar */}
+      <main className="flex-1 p-4">
+        <div className="flex items-center justify-between mb-6">
+          <button className="p-2">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h2 className="text-lg font-medium">April 2025</h2>
+          <button className="p-2">
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {/* Week days */}
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+            <div key={day} className="h-8 flex items-center justify-center text-sm">
+              {day}
+            </div>
+          ))}
+          
+          {/* Calendar days */}
+          {Array.from({ length: 35 }).map((_, i) => {
+            const day = i - 1; // Adjust for April starting on the second cell
+            return (
+              <div
+                key={i}
+                className={`h-14 p-2 flex flex-col items-center ${
+                  day === 7 ? 'bg-[#FDF5E6]' : ''
+                } ${day < 0 || day >= 30 ? 'text-gray-300' : ''}`}
+              >
+                <span>{day + 1}</span>
+                {[7, 8, 9, 16, 18, 21, 22, 23].includes(day) && (
+                  <div className="flex gap-0.5 mt-1">
+                    <div className="w-1 h-1 rounded-full bg-[#C4A484]" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      {/* Bottom Navigation */}
+      <nav className="border-t">
+        <div className="flex justify-around p-4">
+          <Link href="/" className="flex flex-col items-center text-[#C4A484]">
+            <Calendar1 className="w-6 h-6" />
+            <span className="text-sm mt-1">Kalender</span>
+          </Link>
+          <Link href="/chat" className="flex flex-col items-center text-gray-500">
+            <MessageSquare className="w-6 h-6" />
+            <span className="text-sm mt-1">Chat</span>
+          </Link>
+          <Link href="/gallery" className="flex flex-col items-center text-gray-500">
+            <Image className="w-6 h-6" />
+            <span className="text-sm mt-1">Galleri</span>
+          </Link>
+        </div>
+      </nav>
     </div>
   );
 }

@@ -1,6 +1,8 @@
-import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera } from "lucide-react";
-import Link from "next/link";
+"use client";
 
+import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 interface GalleryImage {
   src: string;
@@ -59,6 +61,15 @@ const galleryImages: GalleryImage[] = [
 ];
 
 export default function Gallery() {
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDelete = () => {
+    // Here we would implement the actual delete functionality
+    setShowDeleteConfirm(false);
+    setSelectedImage(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white pb-[72px]">
       {/* Header */}
@@ -77,7 +88,11 @@ export default function Gallery() {
       <main className="flex-1 p-4 bg-[#FDF5E6]/30">
         <div className="grid grid-cols-2 gap-4 pb-[72px]">
           {galleryImages.map((image, index) => (
-            <div key={index} className="relative rounded-lg overflow-hidden bg-white shadow-sm">
+            <div 
+              key={index} 
+              className="relative rounded-lg overflow-hidden bg-white shadow-sm cursor-pointer active:opacity-90"
+              onClick={() => setSelectedImage(image)}
+            >
               <div className="aspect-square relative">
                 <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
                   <ImageIcon className="w-8 h-8 text-gray-400" />
@@ -117,6 +132,72 @@ export default function Gallery() {
           </Link>
         </div>
       </nav>
+
+      {/* Full Screen Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-50 p-4 flex items-center justify-center"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedImage(null);
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-white rounded-2xl overflow-hidden">
+            {/* Image container */}
+            <div 
+              className="w-full aspect-square relative bg-white p-4"
+              onClick={() => setSelectedImage(null)}
+            >
+              <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+                <ImageIcon className="w-16 h-16 text-gray-400" />
+              </div>
+              {/* Actual image would be here */}
+            </div>
+
+            {/* Image date and delete button */}
+            <div className="p-4 border-t flex justify-between items-center">
+              <span className="text-sm font-medium text-gray-600">{selectedImage.date}</span>
+              <button 
+                className="text-red-500 p-1 hover:bg-red-50 rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteConfirm(true);
+                }}
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-[60] p-4 flex items-center justify-center"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowDeleteConfirm(false);
+          }}
+        >
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-semibold mb-2">Slet billede</h3>
+            <p className="text-gray-600 mb-6">Er du sikker på, at du vil slette dette billede? Dette kan ikke fortrydes.</p>
+            <div className="flex gap-3">
+              <button 
+                className="flex-1 py-2 px-4 rounded-full border border-gray-200 text-gray-600"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Annuller
+              </button>
+              <button 
+                className="flex-1 py-2 px-4 rounded-full bg-red-500 text-white"
+                onClick={handleDelete}
+              >
+                Slet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white pb-[72px]">
       {/* Header */}
       <header className="p-4">
         <div className="flex items-center gap-2">
@@ -60,7 +60,7 @@ export default function Home() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="border-t">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t">
         <div className="flex justify-around p-4">
           <Link href="/" className="flex flex-col items-center text-[#C4A484]">
             <Calendar1 className="w-6 h-6" />

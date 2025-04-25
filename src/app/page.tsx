@@ -1,7 +1,76 @@
+"use client";
+
 import { Calendar1, MessageSquare, Image, ChevronLeft, ChevronRight, Cookie } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+
+const monthNames = [
+  "Januar", "Februar", "Marts", "April", "Maj", "Juni",
+  "Juli", "August", "September", "Oktober", "November", "December"
+];
 
 export default function Home() {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+
+  const handlePreviousMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  };
+
+  const handleDateClick = (day: number) => {
+    const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    // Convert to timestamp for URL
+    const timestamp = selectedDate.getTime();
+    window.location.href = `/day/${timestamp}`;
+  };
+
+  const renderCalendarDays = () => {
+    const daysInMonth = getDaysInMonth(currentDate);
+    const firstDayOfMonth = getFirstDayOfMonth(currentDate);
+    const days = [];
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push(
+        <div key={`empty-${i}`} className="h-14 p-2 flex flex-col items-center text-gray-300">
+          <span>{getDaysInMonth(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)) - firstDayOfMonth + i + 1}</span>
+        </div>
+      );
+    }
+
+    // Add cells for the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const isToday = new Date().getDate() === day && 
+                     new Date().getMonth() === currentDate.getMonth() && 
+                     new Date().getFullYear() === currentDate.getFullYear();
+
+      days.push(
+        <button
+          key={day}
+          onClick={() => handleDateClick(day)}
+          className={`h-14 p-2 flex flex-col items-center w-full ${
+            isToday ? 'bg-[#FDF5E6]' : ''
+          } hover:bg-gray-50 active:bg-gray-100`}
+        >
+          <span>{day}</span>
+        </button>
+      );
+    }
+
+    return days;
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white pb-[72px]">
       {/* Header */}
@@ -19,11 +88,19 @@ export default function Home() {
       {/* Calendar */}
       <main className="flex-1 p-4">
         <div className="flex items-center justify-between mb-6">
-          <button className="p-2">
+          <button 
+            className="p-2"
+            onClick={handlePreviousMonth}
+          >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <h2 className="text-lg font-medium">April 2025</h2>
-          <button className="p-2">
+          <h2 className="text-lg font-medium">
+            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+          </h2>
+          <button 
+            className="p-2"
+            onClick={handleNextMonth}
+          >
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
@@ -38,24 +115,7 @@ export default function Home() {
           ))}
           
           {/* Calendar days */}
-          {Array.from({ length: 35 }).map((_, i) => {
-            const day = i - 1; // Adjust for April starting on the second cell
-            return (
-              <div
-                key={i}
-                className={`h-14 p-2 flex flex-col items-center ${
-                  day === 7 ? 'bg-[#FDF5E6]' : ''
-                } ${day < 0 || day >= 30 ? 'text-gray-300' : ''}`}
-              >
-                <span>{day + 1}</span>
-                {[7, 8, 9, 16, 18, 21, 22, 23].includes(day) && (
-                  <div className="flex gap-0.5 mt-1">
-                    <div className="w-1 h-1 rounded-full bg-[#C4A484]" />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {renderCalendarDays()}
         </div>
       </main>
 

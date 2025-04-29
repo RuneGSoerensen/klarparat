@@ -3,8 +3,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getUserName } from "@/lib/auth";
+import { useEffect, useState } from "react";
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { UserProvider } from '../context/UserContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,42 +25,69 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isAuthenticated = localStorage.getItem("isAuthenticated");
-      if (!isAuthenticated && pathname !== "/login") {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed in layout:', user?.uid);
+      setUser(user);
+      setIsLoading(false);
+
+      if (!user && pathname !== "/login") {
         router.replace("/login");
       }
-      if (isAuthenticated && pathname === "/login") {
+      if (user && pathname === "/login") {
         router.replace("/");
       }
-    }
+    });
+
+    return () => unsubscribe();
   }, [pathname, router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userName");
-    window.location.href = "/login";
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      router.replace("/login");
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <div>Loading...</div>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* Show logged-in user name for testing */}
-        {typeof window !== 'undefined' && getUserName() && (
-          <div
-            style={{ position: 'fixed', top: 0, right: 0, background: '#C4A484', color: 'white', padding: '8px 16px', zIndex: 1000, cursor: 'pointer' }}
-            onClick={handleLogout}
-            title="Click to log out"
-          >
-            Logged in as: <b>{getUserName()}</b>
-          </div>
-        )}
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <UserProvider>
+          {user && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                background: '#C4A484',
+                color: 'white',
+                padding: '8px 16px',
+                zIndex: 1000,
+                cursor: 'pointer'
+              }}
+              onClick={handleLogout}
+              title="Click to log out"
+            >
+              Logged in as: <b>{user.email}</b>
+            </div>
+          )}
+          {children}
+        </UserProvider>
       </body>
     </html>
   );

@@ -1,8 +1,13 @@
 "use client";
 
-import { Calendar1, CheckSquare, Square, Plus, SquareCheckBig } from "lucide-react";
+import { Calendar1, CheckSquare, Square, Plus, SquareCheckBig, Check } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
+import { useUser } from '../../../context/UserContext';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../../lib/firebase';
+import { getAuth } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 interface Task {
   id: string;
@@ -10,15 +15,19 @@ interface Task {
   completed: boolean;
 }
 
-export default function DayView({ params }: { params: { date: string } }) {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: "1", text: "Modtag varer og pak korrekt", completed: true },
-    { id: "2", text: "Sauce skal reduceres og monteres", completed: false },
-    { id: "3", text: "Salat bar til morgen skal laves", completed: true },
-    { id: "4", text: "Forberedelse før bryllup menu", completed: true }
-  ]);
+export default function DayView({ params }: { params: Promise<{ date: string }> }) {
+  const { date } = use(params);
+  const { isAdmin, user, isLoading: userLoading } = useUser();
+  const auth = getAuth();
+  const router = useRouter();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [guestCount, setGuestCount] = useState<number>(65);
+  const [description, setDescription] = useState<string>("Vi har et bryllup på torsdag. Der skal laves ret meget til det. Skriv hvis der er spørgsmål. :)");
+  const [newTaskText, setNewTaskText] = useState<string>('');
+  const [showTaskInput, setShowTaskInput] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const date = new Date(parseInt(params.date));
+  const dateObj = new Date(parseInt(date));
   const monthNames = [
     "Januar", "Februar", "Marts", "April", "Maj", "Juni",
     "Juli", "August", "September", "Oktober", "November", "December"
@@ -27,15 +36,101 @@ export default function DayView({ params }: { params: { date: string } }) {
     "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"
   ];
 
-  const toggleTask = (taskId: string) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+  useEffect(() => {
+    if (userLoading) {
+      return;
+    }
+
+    if (!user) {
+      console.log('No authenticated user, redirecting to login');
+      router.replace('/login');
+      return;
+    }
+
+    console.log('User authenticated:', user.uid);
+    if (isAdmin) {
+      const tasksRef = collection(db, 'tasks');
+      const tasksUnsubscribe = onSnapshot(tasksRef, 
+        (snapshot) => {
+          const tasksList = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Task[];
+          setTasks(tasksList);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error('Error fetching tasks:', error);
+          setIsLoading(false);
+        }
+      );
+      return () => tasksUnsubscribe();
+    } else {
+      console.log('User is not an admin');
+      setIsLoading(false);
+    }
+  }, [user, isAdmin, userLoading, router]);
+
+  const toggleTask = async (taskId: string) => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      return;
+    }
+
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        await updateDoc(taskRef, {
+          completed: !task.completed,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling task:', error);
+    }
   };
 
-  const addNewTask = () => {
-    // Implementation for adding new task
+  const addNewTask = async () => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      return;
+    }
+
+    if (newTaskText.trim()) {
+      try {
+        const tasksRef = collection(db, 'tasks');
+        await addDoc(tasksRef, {
+          text: newTaskText,
+          completed: false,
+          userId: auth.currentUser.uid,
+          createdAt: new Date().toISOString()
+        });
+        setNewTaskText('');
+        setShowTaskInput(false);
+      } catch (error) {
+        console.error('Error adding task:', error);
+      }
+    }
   };
+
+  const deleteTask = async (taskId: string) => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      return;
+    }
+
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      await deleteDoc(taskRef);
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
+  if (userLoading || isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -54,18 +149,35 @@ export default function DayView({ params }: { params: { date: string } }) {
 
       <main className="flex-1 p-4 pb-24">
         <div className="mb-4">
-          <h2 className="text-lg">{dayNames[date.getDay()]}, {monthNames[date.getMonth()]} {date.getDate()}</h2>
+          <h2 className="text-lg">{dayNames[dateObj.getDay()]}, {monthNames[dateObj.getMonth()]} {dateObj.getDate()}</h2>
           <div className="flex items-center gap-2 text-gray-600">
             <span>Gæste antal:</span>
-            <span>65</span>
+            {isAdmin ? (
+              <input
+                type="number"
+                value={guestCount}
+                onChange={(e) => setGuestCount(parseInt(e.target.value))}
+                className="border rounded p-1"
+              />
+            ) : (
+              <span>{guestCount}</span>
+            )}
           </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-sm text-gray-600 mb-2">Beskrivelse:</label>
-          <div className="p-4 bg-white rounded-lg border">
-            <p>Vi har et bryllup på torsdag. Der skal laves ret meget til det. Skriv hvis der er spørgsmål. :)</p>
-          </div>
+          {isAdmin ? (
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-4 bg-white rounded-lg border"
+            />
+          ) : (
+            <div className="p-4 bg-white rounded-lg border">
+              <p>{description}</p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -83,6 +195,17 @@ export default function DayView({ params }: { params: { date: string } }) {
               <span className={task.completed ? "line-through text-gray-400" : ""}>
                 {task.text}
               </span>
+              {isAdmin && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTask(task.id);
+                  }}
+                  className="ml-auto text-red-500 cursor-pointer"
+                >
+                  Delete
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -93,15 +216,42 @@ export default function DayView({ params }: { params: { date: string } }) {
           </div>
         )}
 
-        <div className="fixed bottom-6 left-0 right-0 flex justify-center">
-          <button 
-            className="bg-[#C4A484] text-white rounded-lg py-2 px-4 flex items-center gap-2 mx-4"
-            onClick={addNewTask}
-          >
-            <Plus className="w-5 h-5" />
-            <span>Ny Opgave</span>
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="mt-4 flex justify-center">
+            <button 
+              className="bg-[#C4A484] text-white rounded-lg py-2 px-4 flex items-center gap-2"
+              onClick={() => setShowTaskInput(true)}
+            >
+              <Plus className="w-5 h-5" />
+              <span>Ny Opgave</span>
+            </button>
+            {showTaskInput && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <div className="bg-white p-4 rounded-lg">
+                  <input
+                    type="text"
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    placeholder="Ny opgave"
+                    className="border rounded p-2 mb-2"
+                  />
+                  <div className="flex justify-center">
+                    <button 
+                      className="bg-[#C4A484] text-white rounded-lg py-2 px-4 flex items-center gap-2"
+                      onClick={() => {
+                        addNewTask();
+                        setShowTaskInput(false);
+                      }}
+                    >
+                      <Check className="w-5 h-5" />
+                      <span>Tilføj opgave</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );

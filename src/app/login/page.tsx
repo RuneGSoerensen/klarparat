@@ -1,123 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Cookie } from "lucide-react";
-import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { UserRole } from "@/lib/auth";
-
-interface UserData {
-  pin: string;
-  role: UserRole;
-}
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 
 export default function Login() {
-  const [pin, setPin] = useState<string[]>(Array(4).fill(""));
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLocked, setIsLocked] = useState(false);
-  const [lockoutTime, setLockoutTime] = useState(0);
   const router = useRouter();
-
-  // Check for existing lockout
-  useEffect(() => {
-    const storedLockout = localStorage.getItem("loginLockout");
-    if (storedLockout) {
-      const lockoutData = JSON.parse(storedLockout);
-      if (lockoutData.until > Date.now()) {
-        setIsLocked(true);
-        setLockoutTime(Math.ceil((lockoutData.until - Date.now()) / 1000));
-      } else {
-        localStorage.removeItem("loginLockout");
-      }
-    }
-  }, []);
-
-  // Handle lockout timer
-  useEffect(() => {
-    if (isLocked && lockoutTime > 0) {
-      const timer = setInterval(() => {
-        setLockoutTime(prev => {
-          if (prev <= 1) {
-            setIsLocked(false);
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [isLocked, lockoutTime]);
-
-  const handlePinChange = (index: number, value: string) => {
-    if (isLocked) return;
-    
-    // Only allow numbers
-    if (!/^\d*$/.test(value)) return;
-
-    const newPin = [...pin];
-    newPin[index] = value;
-    setPin(newPin);
-
-    // Auto-focus next input
-    if (value && index < 3) {
-      const nextInput = document.querySelector(`input[name="pin-${index + 1}"]`) as HTMLInputElement;
-      if (nextInput) nextInput.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !pin[index] && index > 0) {
-      const prevInput = document.querySelector(`input[name="pin-${index - 1}"]`) as HTMLInputElement;
-      if (prevInput) prevInput.focus();
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLocked) return;
+    setError("");
 
-    const enteredPin = pin.join("");
-    
     try {
-      // Get the users and their PINs from Firestore
-      const usersDoc = await getDoc(doc(db, "settings", "users"));
-      const users = usersDoc.data();
-      
-      if (!users) {
-        setError("Systemfejl. Kontakt administrator.");
-        return;
-      }
-
-      // Find the user with matching PIN
-      const matchedUser = Object.entries(users).find(([, userData]: [string, UserData]) => 
-        userData.pin === enteredPin
-      );
-
-      if (matchedUser) {
-        const [name, userData] = matchedUser;
-        // Store successful login with role and name
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("userRole", userData.role);
-        localStorage.setItem("userName", name);
-        router.push("/");
-      } else {
-        setError("Forkert PIN");
-        const attempts = parseInt(localStorage.getItem("loginAttempts") || "0") + 1;
-        localStorage.setItem("loginAttempts", attempts.toString());
-        
-        // Implement lockout after 3 failed attempts
-        if (attempts >= 3) {
-          const lockoutUntil = Date.now() + 5 * 60 * 1000; // 5 minutes
-          localStorage.setItem("loginLockout", JSON.stringify({ until: lockoutUntil }));
-          setIsLocked(true);
-          setLockoutTime(300); // 5 minutes in seconds
-        }
-      }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Logged in successfully:", userCredential.user.uid);
+      router.push("/");
     } catch (error) {
       console.error("Login error:", error);
-      setError("Der opstod en fejl. Prøv igen senere.");
+      if (error instanceof FirebaseError) {
+        setError(error.message);
+      } else {
+        setError("Der opstod en fejl. Prøv igen senere.");
+      }
     }
   };
 
@@ -135,36 +45,43 @@ export default function Login() {
           <h2 className="text-2xl font-semibold text-center mb-8">Log ind</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex justify-center gap-2">
-              {pin.map((digit, index) => (
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
                 <input
-                  key={index}
-                  type="password"
-                  name={`pin-${index}`}
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handlePinChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-12 text-center text-xl border rounded-lg focus:outline-none focus:border-[#C4A484]"
-                  disabled={isLocked}
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C4A484] focus:ring-[#C4A484]"
+                  required
                 />
-              ))}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Adgangskode
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C4A484] focus:ring-[#C4A484]"
+                  required
+                />
+              </div>
             </div>
 
             {error && (
               <p className="text-red-500 text-center">{error}</p>
             )}
 
-            {isLocked && (
-              <p className="text-center text-gray-600">
-                Prøv igen om {lockoutTime} sekunder
-              </p>
-            )}
-
             <button
               type="submit"
-              disabled={isLocked || pin.some(digit => !digit)}
-              className="w-full bg-[#C4A484] text-white rounded-lg py-3 disabled:opacity-50"
+              className="w-full bg-[#C4A484] text-white rounded-lg py-3 hover:bg-[#B39374] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C4A484]"
             >
               Log ind
             </button>

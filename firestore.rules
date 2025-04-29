@@ -2,9 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Only allow clients to read the PIN value:
-    match /settings/pin {
-      allow read: if true;     // clients may fetch the PIN for login
+    // Allow reading users document for authentication
+    match /settings/users {
+      allow read: if true;     // clients may fetch user data for login
       allow write: if false;   // no client-side writes ever
     }
 

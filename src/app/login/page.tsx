@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { Cookie } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { UserRole } from "@/lib/auth";
+
+interface UserData {
+  pin: string;
+  role: UserRole;
+}
 
 export default function Login() {
   const [pin, setPin] = useState<string[]>(Array(4).fill(""));
@@ -75,13 +81,26 @@ export default function Login() {
     const enteredPin = pin.join("");
     
     try {
-      // Get the PIN from Firestore
-      const pinDoc = await getDoc(doc(db, "settings", "pin"));
-      const storedPin = pinDoc.data()?.value;
+      // Get the users and their PINs from Firestore
+      const usersDoc = await getDoc(doc(db, "settings", "users"));
+      const users = usersDoc.data();
+      
+      if (!users) {
+        setError("Systemfejl. Kontakt administrator.");
+        return;
+      }
 
-      if (enteredPin === storedPin) {
-        // Store successful login
+      // Find the user with matching PIN
+      const matchedUser = Object.entries(users).find(([, userData]: [string, UserData]) => 
+        userData.pin === enteredPin
+      );
+
+      if (matchedUser) {
+        const [name, userData] = matchedUser;
+        // Store successful login with role and name
         localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userRole", userData.role);
+        localStorage.setItem("userName", name);
         router.push("/");
       } else {
         setError("Forkert PIN");

@@ -2,7 +2,9 @@
 
 import { Calendar1, MessageSquare, Image, ChevronLeft, ChevronRight, Cookie } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const monthNames = [
   "Januar", "Februar", "Marts", "April", "Maj", "Juni",
@@ -11,6 +13,38 @@ const monthNames = [
 
 export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [daysWithTasks, setDaysWithTasks] = useState<Set<string>>(new Set());
+
+  // Fetch tasks for the current month
+  useEffect(() => {
+    const fetchTasksForMonth = async () => {
+      // Get start and end of month timestamps
+      const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getTime().toString();
+      const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getTime().toString();
+      
+      const tasksRef = collection(db, 'tasks');
+      const q = query(tasksRef, 
+        where('date', '>=', startOfMonth),
+        where('date', '<=', endOfMonth)
+      );
+
+      try {
+        const querySnapshot = await getDocs(q);
+        const tasksPerDay = new Set<string>();
+        querySnapshot.forEach(doc => {
+          const taskData = doc.data();
+          if (taskData.date) {
+            tasksPerDay.add(taskData.date);
+          }
+        });
+        setDaysWithTasks(tasksPerDay);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    fetchTasksForMonth();
+  }, [currentDate]);
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -51,6 +85,9 @@ export default function Home() {
 
     // Add cells for the current month
     for (let day = 1; day <= daysInMonth; day++) {
+      const currentDayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const timestamp = currentDayDate.getTime().toString();
+      const hasTasks = daysWithTasks.has(timestamp);
       const isToday = new Date().getDate() === day && 
                      new Date().getMonth() === currentDate.getMonth() && 
                      new Date().getFullYear() === currentDate.getFullYear();
@@ -64,6 +101,13 @@ export default function Home() {
           } hover:bg-gray-50 active:bg-gray-100`}
         >
           <span>{day}</span>
+          {hasTasks && (
+            <div className="flex gap-0.5 mt-1">
+              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
+              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
+              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
+            </div>
+          )}
         </button>
       );
     }

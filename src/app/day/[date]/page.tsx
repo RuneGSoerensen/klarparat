@@ -8,7 +8,7 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'fireb
 import { db } from '../../../lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { getDayData, createOrUpdateDay } from '@/lib/dayManagement';
+import { createOrUpdateDay } from '@/lib/dayManagement';
 
 interface Task {
   id: string;
@@ -48,18 +48,22 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
 
   // Load day data
   useEffect(() => {
-    const loadDayData = async () => {
-      if (!user) return;
-      
-      const dayData = await getDayData(date);
-      if (dayData) {
-        setDescription(dayData.description);
-        setGuestCount(dayData.guestCount);
+    if (!user) return;
+    
+    const dayRef = doc(db, 'days', date);
+    const unsubscribe = onSnapshot(dayRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const dayData = snapshot.data();
+        setDescription(dayData.description || "");
+        setGuestCount(dayData.guestCount || 0);
       }
       setIsLoading(false);
-    };
+    }, (error) => {
+      console.error('Error fetching day data:', error);
+      setIsLoading(false);
+    });
 
-    loadDayData();
+    return () => unsubscribe();
   }, [date, user]);
 
   useEffect(() => {
@@ -190,12 +194,29 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
             {isAdmin ? (
               <input
                 type="number"
-                value={guestCount}
-                onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                className="border rounded p-1"
+                min="0"
+                value={guestCount || ''}
+                onChange={async (e) => {
+                  if (!user) return;
+                  const value = e.target.value;
+                  // If empty, set to 0
+                  const newCount = value === '' ? 0 : parseInt(value);
+                  // Only update if it's a valid number
+                  if (!isNaN(newCount)) {
+                    setGuestCount(newCount);
+                    try {
+                      await createOrUpdateDay(date, {
+                        guestCount: newCount
+                      }, user.uid);
+                    } catch (error) {
+                      console.error('Error updating guest count:', error);
+                    }
+                  }
+                }}
+                className="border rounded p-1 w-20"
               />
             ) : (
-              <span className="text-[#B0976D]">{guestCount}</span>
+              <span>{guestCount}</span>
             )}
           </div>
         </div>

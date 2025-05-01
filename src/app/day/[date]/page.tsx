@@ -2,12 +2,13 @@
 
 import { Calendar1, CheckSquare, Square, Plus, SquareCheckBig, Check } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import { useUser } from '../../../context/UserContext';
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { getDayData, createOrUpdateDay } from '@/lib/dayManagement';
 
 interface Task {
   id: string;
@@ -22,10 +23,11 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [guestCount, setGuestCount] = useState<number>(65);
-  const [description, setDescription] = useState<string>("Vi har et bryllup på torsdag. Der skal laves ret meget til det. Skriv hvis der er spørgsmål. :)");
+  const [description, setDescription] = useState<string>("");
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [showTaskInput, setShowTaskInput] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const dateObj = new Date(parseInt(date));
   const monthNames = [
@@ -35,6 +37,30 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
   const dayNames = [
     "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"
   ];
+
+  // Add auto-resize effect for textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [description]);
+
+  // Load day data
+  useEffect(() => {
+    const loadDayData = async () => {
+      if (!user) return;
+      
+      const dayData = await getDayData(date);
+      if (dayData) {
+        setDescription(dayData.description);
+        setGuestCount(dayData.guestCount);
+      }
+      setIsLoading(false);
+    };
+
+    loadDayData();
+  }, [date, user]);
 
   useEffect(() => {
     if (userLoading) {
@@ -70,6 +96,20 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
       setIsLoading(false);
     }
   }, [user, isAdmin, userLoading, router]);
+
+  // Handle description update
+  const handleDescriptionChange = async (newDescription: string) => {
+    if (!user || !isAdmin) return;
+    
+    setDescription(newDescription);
+    try {
+      await createOrUpdateDay(date, {
+        description: newDescription
+      }, user.uid);
+    } catch (error) {
+      console.error('Error updating description:', error);
+    }
+  };
 
   const toggleTask = async (taskId: string) => {
     if (!auth.currentUser) {
@@ -169,13 +209,16 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
           <label className="block text-sm text-gray-600 mb-2">Beskrivelse:</label>
           {isAdmin ? (
             <textarea
+              ref={textareaRef}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-4 bg-white rounded-lg border"
+              onChange={(e) => handleDescriptionChange(e.target.value)}
+              placeholder="Ingen beskrivelse endnu.."
+              className="w-full p-4 bg-white rounded-lg border min-h-[100px] overflow-hidden"
+              style={{ resize: 'none' }}
             />
           ) : (
-            <div className="p-4 bg-white rounded-lg border">
-              <p>{description}</p>
+            <div className="p-4 bg-white rounded-lg border whitespace-pre-wrap break-words min-h-[100px]">
+              <p>{description || "Ingen beskrivelse endnu.."}</p>
             </div>
           )}
         </div>

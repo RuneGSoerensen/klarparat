@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { getUserData, updateUserEmail } from '@/lib/userManagement';
 
 interface UserContextType {
   isAdmin: boolean;
@@ -18,14 +19,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     console.log('Setting up Firebase auth listener in UserContext');
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log('Firebase auth state changed in UserContext:', user?.uid);
       setUser(user);
       
       if (user) {
-        // Check if user is admin (you might want to store this in Firestore)
-        const storedRole = localStorage.getItem('userRole');
-        setIsAdmin(storedRole === 'admin');
+        // Check Firestore for user role
+        const userData = await getUserData(user.uid);
+        console.log('User data from Firestore:', userData);
+        
+        // If email doesn't match, update it
+        if (userData && userData.email !== user.email && user.email) {
+          console.log('Updating email in Firestore to match Auth email');
+          await updateUserEmail(user.uid, user.email);
+        }
+        
+        setIsAdmin(userData?.role === 'admin');
       } else {
         setIsAdmin(false);
       }
@@ -38,7 +47,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setUserRole = (role: boolean) => {
     setIsAdmin(role);
-    localStorage.setItem('userRole', role ? 'admin' : 'user');
   };
 
   return (

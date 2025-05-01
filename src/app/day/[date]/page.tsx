@@ -4,7 +4,7 @@ import { Calendar1, CheckSquare, Square, Plus, SquareCheckBig, Check } from "luc
 import Link from "next/link";
 import { useState, useEffect, use, useRef } from "react";
 import { useUser } from '../../../context/UserContext';
-import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -79,7 +79,8 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
 
     console.log('User authenticated:', user.uid);
     const tasksRef = collection(db, 'tasks');
-    const tasksUnsubscribe = onSnapshot(tasksRef, 
+    const q = query(tasksRef, where('date', '==', date));
+    const tasksUnsubscribe = onSnapshot(q, 
       (snapshot) => {
         const tasksList = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -94,7 +95,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
       }
     );
     return () => tasksUnsubscribe();
-  }, [user, userLoading, router]);
+  }, [user, userLoading, router, date]);
 
   // Handle description update
   const handleDescriptionChange = async (newDescription: string) => {
@@ -143,6 +144,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
           text: newTaskText,
           completed: false,
           userId: auth.currentUser.uid,
+          date: date,
           createdAt: new Date().toISOString()
         });
         setNewTaskText('');

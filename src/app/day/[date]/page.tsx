@@ -22,7 +22,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
   const auth = getAuth();
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [guestCount, setGuestCount] = useState<number>(65);
+  const [guestCount, setGuestCount] = useState<number>(0);
   const [description, setDescription] = useState<string>("");
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [showTaskInput, setShowTaskInput] = useState<boolean>(false);

@@ -17,6 +17,11 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Helper function to check if only completion status is being updated
+    function isCompletionUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['completed', 'updatedAt']);
+    }
+
     // Users collection rules
     match /users/{userId} {
       // Anyone can read user documents (needed for role checks)
@@ -47,8 +52,11 @@ service cloud.firestore {
     match /tasks/{taskId} {
       // Anyone authenticated can read tasks
       allow read: if isAuthenticated();
-      // Only admins can create/update/delete tasks
-      allow create, update, delete: if isAdmin();
+      // Allow authenticated users to update only the completion status
+      allow update: if isAuthenticated() && isCompletionUpdate();
+      // Only admins can create/delete tasks and make other updates
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin();
     }
 
     // Default deny

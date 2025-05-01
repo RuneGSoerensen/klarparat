@@ -74,28 +74,23 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
     }
 
     console.log('User authenticated:', user.uid);
-    if (isAdmin) {
-      const tasksRef = collection(db, 'tasks');
-      const tasksUnsubscribe = onSnapshot(tasksRef, 
-        (snapshot) => {
-          const tasksList = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as Task[];
-          setTasks(tasksList);
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error('Error fetching tasks:', error);
-          setIsLoading(false);
-        }
-      );
-      return () => tasksUnsubscribe();
-    } else {
-      console.log('User is not an admin');
-      setIsLoading(false);
-    }
-  }, [user, isAdmin, userLoading, router]);
+    const tasksRef = collection(db, 'tasks');
+    const tasksUnsubscribe = onSnapshot(tasksRef, 
+      (snapshot) => {
+        const tasksList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Task[];
+        setTasks(tasksList);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching tasks:', error);
+        setIsLoading(false);
+      }
+    );
+    return () => tasksUnsubscribe();
+  }, [user, userLoading, router]);
 
   // Handle description update
   const handleDescriptionChange = async (newDescription: string) => {
@@ -200,7 +195,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
                 className="border rounded p-1"
               />
             ) : (
-              <span>{guestCount}</span>
+              <span className="text-[#B0976D]">{guestCount}</span>
             )}
           </div>
         </div>

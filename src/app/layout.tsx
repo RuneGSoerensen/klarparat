@@ -86,7 +86,7 @@ export default function RootLayout({
               Logged in as: <b>{user.email}</b>
             </div>
           )}
-          {children}
+        {children}
         </UserProvider>
       </body>
     </html>

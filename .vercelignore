@@ -1,0 +1,6 @@
+functions/
+README.md
+firebase.json
+.firebaserc
+firestore.rules
+firestore.indexes.json 

@@ -6,6 +6,7 @@ import { Cookie } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { getUserData } from "@/lib/userManagement";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,21 @@ export default function Login() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("Logged in successfully:", userCredential.user.uid);
-      router.push("/");
+      
+      // Get user role from Firestore
+      const userData = await getUserData(userCredential.user.uid);
+      console.log("User data from Firestore:", userData);
+      
+      if (userData) {
+        // Set role in localStorage for easy access
+        localStorage.setItem("userRole", userData.role);
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userName", userData.email);
+        
+        router.push("/");
+      } else {
+        setError("User data not found. Please contact an administrator.");
+      }
     } catch (error) {
       console.error("Login error:", error);
       if (error instanceof FirebaseError) {

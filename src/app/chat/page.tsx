@@ -15,7 +15,7 @@ const messages: Message[] = [
   },
   {
     sender: "Søren",
-    content: "Bare rolig, Louise. Det er gjort, og varene skulle gerne kommer imorgen tidligt! :)",
+    content: "Søren skriver en mega fed besked fordi rune skal lige pushe noget for at test noget.",
     time: "2:26"
   },
   {

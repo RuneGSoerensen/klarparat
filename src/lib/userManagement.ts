@@ -6,15 +6,17 @@ export type UserRole = 'admin' | 'basic';
 export interface UserData {
   uid: string;
   email: string;
+  name: string;
   role: UserRole;
   createdAt: string;
 }
 
-export const createUserDocument = async (uid: string, email: string): Promise<void> => {
+export const createUserDocument = async (uid: string, email: string, name: string): Promise<void> => {
   const userRef = doc(db, 'users', uid);
   const userData: UserData = {
     uid,
     email,
+    name,
     role: 'basic', // Default role
     createdAt: new Date().toISOString()
   };
@@ -40,4 +42,9 @@ export const updateUserRole = async (targetUid: string, newRole: UserRole): Prom
 export const updateUserEmail = async (uid: string, newEmail: string): Promise<void> => {
   const userRef = doc(db, 'users', uid);
   await updateDoc(userRef, { email: newEmail });
+};
+
+export const updateUserName = async (uid: string, newName: string): Promise<void> => {
+  const userRef = doc(db, 'users', uid);
+  await updateDoc(userRef, { name: newName });
 }; 

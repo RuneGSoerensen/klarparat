@@ -6,6 +6,11 @@ import { getUserData, updateUserEmail } from '@/lib/userManagement';
 interface UserContextType {
   isAdmin: boolean;
   user: User | null;
+  userData: {
+    name: string;
+    email: string;
+    role: 'admin' | 'basic';
+  } | null;
   isLoading: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
 }
@@ -15,6 +20,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserContextType['userData']>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,9 +40,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await updateUserEmail(user.uid, user.email);
         }
         
+        if (userData) {
+          setUserData({
+            name: userData.name,
+            email: userData.email,
+            role: userData.role
+          });
+        }
+        
         setIsAdmin(userData?.role === 'admin');
       } else {
         setIsAdmin(false);
+        setUserData(null);
       }
       
       setIsLoading(false);
@@ -50,7 +65,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <UserContext.Provider value={{ isAdmin, user, isLoading, setIsAdmin: setUserRole }}>
+    <UserContext.Provider value={{ isAdmin, user, userData, isLoading, setIsAdmin: setUserRole }}>
       {children}
     </UserContext.Provider>
   );

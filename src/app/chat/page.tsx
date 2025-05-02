@@ -1,31 +1,62 @@
+"use client";
+
 import { MessageSquare, Cookie, Send, Calendar1, Image } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { useUser } from "@/context/UserContext";
 
 interface Message {
+  id: string;
   sender: string;
   content: string;
   time: string;
+  timestamp: Timestamp;
 }
 
-const messages: Message[] = [
-  {
-    sender: "Louise",
-    content: "Er der nogen der har bestilt varer til imorgen, egentlig? Jeg har nemlig glemt det.",
-    time: "9:23"
-  },
-  {
-    sender: "Søren",
-    content: "Søren skriver en mega fed besked fordi rune skal lige pushe noget for at test noget.",
-    time: "2:26"
-  },
-  {
-    sender: "Sarah",
-    content: "Fedt! Jeg kommer ind tidligt og hjælper.",
-    time: "9:30"
-  }
-];
-
 export default function Chat() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const { user, userData } = useUser();
+
+  useEffect(() => {
+    const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const messageList: Message[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        messageList.push({
+          id: doc.id,
+          sender: data.sender,
+          content: data.content,
+          time: new Date(data.timestamp?.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: data.timestamp
+        });
+      });
+      setMessages(messageList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user || !userData) return;
+
+    try {
+      await addDoc(collection(db, "messages"), {
+        sender: userData.name,
+        content: newMessage,
+        timestamp: serverTimestamp(),
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-white pb-[72px]">
       {/* Header */}
@@ -43,8 +74,8 @@ export default function Chat() {
       {/* Chat Messages */}
       <main className="flex-1 p-4 bg-[#FDF5E6]/30 overflow-y-auto">
         <div className="flex flex-col gap-4">
-          {messages.map((message, index) => (
-            <div key={index} className="flex flex-col gap-1">
+          {messages.map((message) => (
+            <div key={message.id} className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
                 <span className="font-medium">{message.sender}:</span>
                 <span className="text-sm text-gray-500">{message.time}</span>
@@ -59,16 +90,22 @@ export default function Chat() {
 
       {/* Message Input */}
       <div className="fixed bottom-[72px] left-0 right-0 bg-white border-t p-4">
-        <div className="flex items-center gap-2">
+        <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
             className="flex-1 p-3 rounded-full border border-gray-200 focus:outline-none focus:border-[#C4A484]"
           />
-          <button className="p-3 text-[#C4A484] hover:bg-[#FDF5E6]/50 rounded-full">
+          <button 
+            type="submit"
+            className="p-3 text-[#C4A484] hover:bg-[#FDF5E6]/50 rounded-full"
+            disabled={!user || !userData}
+          >
             <Send className="w-5 h-5" />
           </button>
-        </div>
+        </form>
       </div>
 
       {/* Bottom Navigation */}

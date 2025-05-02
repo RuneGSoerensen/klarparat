@@ -59,6 +59,19 @@ service cloud.firestore {
       allow update: if isAdmin();
     }
 
+    // Messages collection rules
+    match /messages/{messageId} {
+      // Anyone authenticated can read messages
+      allow read: if isAuthenticated();
+      // Anyone authenticated can create messages
+      allow create: if isAuthenticated() &&
+        request.resource.data.keys().hasAll(['sender', 'content', 'timestamp']) &&
+        request.resource.data.sender is string &&
+        request.resource.data.content is string;
+      // Only admins can delete messages
+      allow delete: if isAdmin();
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;

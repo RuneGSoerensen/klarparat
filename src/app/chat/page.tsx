@@ -2,7 +2,7 @@
 
 import { MessageSquare, Cookie, Send, Calendar1, Image } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { useUser } from "@/context/UserContext";
@@ -19,6 +19,28 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { user, userData } = useUser();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+
+  const scrollToBottom = () => {
+    if (shouldAutoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Handle scroll events to determine if we should auto-scroll
+  const handleScroll = () => {
+    if (!mainRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = mainRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+    setShouldAutoScroll(isNearBottom);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
@@ -52,15 +74,16 @@ export default function Chat() {
         timestamp: serverTimestamp(),
       });
       setNewMessage("");
+      setShouldAutoScroll(true); // Re-enable auto-scroll when sending a message
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-[72px]">
+    <div className="flex flex-col h-screen bg-white">
       {/* Header */}
-      <header className="p-4">
+      <header className="flex-none p-4 border-b">
         <div className="flex items-center gap-2">
           <Cookie className="w-6 h-6 text-[#C4A484]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
@@ -72,8 +95,12 @@ export default function Chat() {
       </header>
 
       {/* Chat Messages */}
-      <main className="flex-1 p-4 bg-[#FDF5E6]/30 overflow-y-auto">
-        <div className="flex flex-col gap-4">
+      <main 
+        ref={mainRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4 bg-[#FDF5E6]/30"
+      >
+        <div className="flex flex-col gap-4 pb-4">
           {messages.map((message) => (
             <div key={message.id} className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
@@ -85,11 +112,12 @@ export default function Chat() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       </main>
 
       {/* Message Input */}
-      <div className="fixed bottom-[72px] left-0 right-0 bg-white border-t p-4">
+      <div className="flex-none border-t bg-white p-4">
         <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
@@ -109,7 +137,7 @@ export default function Chat() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <nav className="flex-none border-t bg-white">
         <div className="flex justify-around p-4">
           <Link href="/" className="flex flex-col items-center text-gray-500">
             <Calendar1 className="w-6 h-6" />

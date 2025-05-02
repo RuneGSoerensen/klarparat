@@ -80,6 +80,10 @@ export default function Chat() {
     }
   };
 
+  const isOwnMessage = (sender: string) => {
+    return userData?.name === sender;
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Header */}
@@ -101,17 +105,27 @@ export default function Chat() {
         className="flex-1 overflow-y-auto p-4 bg-[#FDF5E6]/30"
       >
         <div className="flex flex-col gap-4 pb-4">
-          {messages.map((message) => (
-            <div key={message.id} className="flex flex-col gap-1">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">{message.sender}:</span>
-                <span className="text-sm text-gray-500">{message.time}</span>
+          {messages.map((message) => {
+            const ownMessage = isOwnMessage(message.sender);
+            return (
+              <div 
+                key={message.id} 
+                className={`flex flex-col gap-1 ${ownMessage ? 'items-end' : 'items-start'}`}
+              >
+                <div className={`flex items-center gap-2 ${ownMessage ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <span className="font-medium">{message.sender}</span>
+                  <span className="text-sm text-gray-500">{message.time}</span>
+                </div>
+                <div 
+                  className={`p-4 rounded-lg shadow-sm max-w-[80%] bg-white`}
+                >
+                  <p className="text-gray-800">
+                    {message.content}
+                  </p>
+                </div>
               </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm">
-                <p className="text-gray-800">{message.content}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
       </main>

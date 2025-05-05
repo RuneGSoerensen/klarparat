@@ -174,15 +174,15 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <header className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <SquareCheckBig className="w-5 h-5 text-[#C4A484]" />
+            <SquareCheckBig className="w-5 h-5 text-[var(--accent)]" />
             <span className="text-lg">To-do liste</span>
           </div>
         </div>
-        <Link href="/" className="text-[#C4A484] flex flex-col items-center">
+        <Link href="/" className="text-[var(--accent)] flex flex-col items-center">
           <Calendar1 className="w-5 h-5" />
           <span className="text-sm">Kalender</span>
         </Link>
@@ -231,11 +231,11 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
               value={description}
               onChange={(e) => handleDescriptionChange(e.target.value)}
               placeholder="Ingen beskrivelse endnu.."
-              className="w-full p-4 bg-white rounded-lg border min-h-[100px] overflow-hidden"
+              className="w-full p-4 bg-[var(--background)] rounded-lg border min-h-[100px] overflow-hidden text-[var(--foreground)]"
               style={{ resize: 'none' }}
             />
           ) : (
-            <div className="p-4 bg-white rounded-lg border whitespace-pre-wrap break-words min-h-[100px]">
+            <div className="p-4 bg-[var(--background)] rounded-lg border whitespace-pre-wrap break-words min-h-[100px] text-[var(--foreground)]">
               <p>{description || "Ingen beskrivelse endnu.."}</p>
             </div>
           )}
@@ -245,11 +245,11 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
           {tasks.map(task => (
             <button
               key={task.id}
-              className="w-full p-4 bg-white border rounded-lg flex items-center gap-3 text-left"
+              className="w-full p-4 bg-[var(--background)] border rounded-lg flex items-center gap-3 text-left"
               onClick={() => toggleTask(task.id)}
             >
               {task.completed ? (
-                <CheckSquare className="w-5 h-5 text-[#C4A484]" />
+                <CheckSquare className="w-5 h-5 text-[var(--accent)]" />
               ) : (
                 <Square className="w-5 h-5" />
               )}
@@ -280,7 +280,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
         {isAdmin && (
           <div className="mt-4 flex justify-center">
             <button 
-              className="bg-[#C4A484] text-white rounded-lg py-2 px-4 flex items-center gap-2"
+              className="bg-[var(--accent)] text-white rounded-lg py-2 px-4 flex items-center gap-2"
               onClick={() => setShowTaskInput(true)}
             >
               <Plus className="w-5 h-5" />
@@ -288,7 +288,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
             </button>
             {showTaskInput && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                <div className="bg-white p-4 rounded-lg">
+                <div className="bg-[var(--background)] p-4 rounded-lg">
                   <input
                     type="text"
                     value={newTaskText}
@@ -298,7 +298,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
                   />
                   <div className="flex justify-center">
                     <button 
-                      className="bg-[#C4A484] text-white rounded-lg py-2 px-4 flex items-center gap-2"
+                      className="bg-[var(--accent)] text-white rounded-lg py-2 px-4 flex items-center gap-2"
                       onClick={() => {
                         addNewTask();
                         setShowTaskInput(false);

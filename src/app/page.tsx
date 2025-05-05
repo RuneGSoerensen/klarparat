@@ -96,16 +96,14 @@ export default function Home() {
         <button
           key={day}
           onClick={() => handleDateClick(day)}
-          className={`h-14 p-2 flex flex-col items-center w-full ${
-            isToday ? 'bg-[#FDF5E6]' : ''
-          } hover:bg-gray-50 active:bg-gray-100`}
+          className={`h-14 p-2 flex flex-col items-center w-full ${isToday ? 'bg-[var(--calendar-today)]' : ''} hover:bg-[var(--gallery-bg)] active:bg-[var(--calendar-today)]`}
         >
           <span>{day}</span>
           {hasTasks && (
             <div className="flex gap-0.5 mt-1">
-              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
-              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
-              <div className="w-1 h-1 rounded-full bg-[#C4A484]"></div>
+              <div className="w-1 h-1 rounded-full bg-[var(--accent)]"></div>
+              <div className="w-1 h-1 rounded-full bg-[var(--accent)]"></div>
+              <div className="w-1 h-1 rounded-full bg-[var(--accent)]"></div>
             </div>
           )}
         </button>
@@ -116,15 +114,15 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-[72px]">
+    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-[72px]">
       {/* Header */}
       <header className="p-4">
         <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[#C4A484]" />
+          <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
         <div className="flex items-center gap-2 mt-4">
-          <Calendar1 className="w-5 h-5 text-[#C4A484]" />
+          <Calendar1 className="w-5 h-5 text-[var(--accent)]" />
           <h2 className="text-lg">Kalender</h2>
         </div>
       </header>
@@ -166,7 +164,7 @@ export default function Home() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t">
         <div className="flex justify-around p-4">
-          <Link href="/" className="flex flex-col items-center text-[#C4A484]">
+          <Link href="/" className="flex flex-col items-center text-[var(--accent)]">
             <Calendar1 className="w-6 h-6" />
             <span className="text-sm mt-1">Kalender</span>
           </Link>

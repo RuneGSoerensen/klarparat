@@ -85,15 +85,15 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-[var(--background)]">
       {/* Header */}
       <header className="flex-none p-4 border-b">
         <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[#C4A484]" />
+          <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
         <div className="flex items-center gap-2 mt-4">
-          <MessageSquare className="w-5 h-5 text-[#C4A484]" />
+          <MessageSquare className="w-5 h-5 text-[var(--accent)]" />
           <h2 className="text-lg">Team Chat</h2>
         </div>
       </header>
@@ -102,7 +102,7 @@ export default function Chat() {
       <main 
         ref={mainRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 bg-[#FDF5E6]/30"
+        className="flex-1 overflow-y-auto p-4 bg-[var(--gallery-bg)]"
       >
         <div className="flex flex-col gap-4 pb-4">
           {messages.map((message) => {
@@ -117,9 +117,9 @@ export default function Chat() {
                   <span className="text-sm text-gray-500">{message.time}</span>
                 </div>
                 <div 
-                  className={`p-4 rounded-lg shadow-sm max-w-[80%] bg-white`}
+                  className={`p-4 rounded-lg shadow-sm max-w-[80%] bg-[var(--background)]`}
                 >
-                  <p className="text-gray-800">
+                  <p className="text-[var(--foreground)]">
                     {message.content}
                   </p>
                 </div>
@@ -131,18 +131,18 @@ export default function Chat() {
       </main>
 
       {/* Message Input */}
-      <div className="flex-none border-t bg-white p-4">
+      <div className="flex-none border-t bg-[var(--background)] p-4">
         <form onSubmit={sendMessage} className="flex items-center gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 p-3 rounded-full border border-gray-200 focus:outline-none focus:border-[#C4A484]"
+            className="flex-1 p-3 rounded-full border border-[var(--input-border)] focus:outline-none focus:border-[var(--input-focus)]"
           />
           <button 
             type="submit"
-            className="p-3 text-[#C4A484] hover:bg-[#FDF5E6]/50 rounded-full"
+            className="p-3 text-[var(--accent)] hover:bg-[var(--gallery-bg)] rounded-full"
             disabled={!user || !userData}
           >
             <Send className="w-5 h-5" />
@@ -151,13 +151,13 @@ export default function Chat() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="flex-none border-t bg-white">
+      <nav className="flex-none border-t bg-[var(--background)]">
         <div className="flex justify-around p-4">
           <Link href="/" className="flex flex-col items-center text-gray-500">
             <Calendar1 className="w-6 h-6" />
             <span className="text-sm mt-1">Kalender</span>
           </Link>
-          <Link href="/chat" className="flex flex-col items-center text-[#C4A484]">
+          <Link href="/chat" className="flex flex-col items-center text-[var(--accent)]">
             <MessageSquare className="w-6 h-6" />
             <span className="text-sm mt-1">Chat</span>
           </Link>

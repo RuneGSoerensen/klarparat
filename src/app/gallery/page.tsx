@@ -71,26 +71,26 @@ export default function Gallery() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-[72px]">
+    <div className="flex flex-col min-h-screen bg-[var(--background)] pb-[72px]">
       {/* Header */}
       <header className="p-4">
         <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[#C4A484]" />
+          <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
         <div className="flex items-center gap-2 mt-4">
-          <ImageIcon className="w-5 h-5 text-[#C4A484]" />
+          <ImageIcon className="w-5 h-5 text-[var(--accent)]" />
           <h2 className="text-lg">Galleri</h2>
         </div>
       </header>
 
       {/* Gallery Content */}
-      <main className="flex-1 p-4 bg-[#FDF5E6]/30">
+      <main className="flex-1 p-4 bg-[var(--gallery-bg)]">
         <div className="grid grid-cols-2 gap-4 pb-[72px]">
           {galleryImages.map((image, index) => (
             <div 
               key={index} 
-              className="relative rounded-lg overflow-hidden bg-white shadow-sm cursor-pointer active:opacity-90"
+              className="relative rounded-lg overflow-hidden bg-[var(--background)] shadow-sm cursor-pointer active:opacity-90"
               onClick={() => setSelectedImage(image)}
             >
               <div className="aspect-square relative">
@@ -108,15 +108,15 @@ export default function Gallery() {
       </main>
 
       {/* Upload Button */}
-      <div className="fixed bottom-[72px] left-0 right-0 p-4 bg-white">
-        <button className="w-full bg-[#C4A484] text-white rounded-full py-3 px-4 flex items-center justify-center gap-2">
+      <div className="fixed bottom-[72px] left-0 right-0 p-4 bg-[var(--background)]">
+        <button className="w-full bg-[var(--accent)] text-white rounded-full py-3 px-4 flex items-center justify-center gap-2">
           <Camera className="w-5 h-5" />
           <span>Upload Nyt Billede</span>
         </button>
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <nav className="fixed bottom-0 left-0 right-0 bg-[var(--background)] border-t">
         <div className="flex justify-around p-4">
           <Link href="/" className="flex flex-col items-center text-gray-500">
             <Calendar1 className="w-6 h-6" />
@@ -126,7 +126,7 @@ export default function Gallery() {
             <MessageSquare className="w-6 h-6" />
             <span className="text-sm mt-1">Chat</span>
           </Link>
-          <Link href="/gallery" className="flex flex-col items-center text-[#C4A484]">
+          <Link href="/gallery" className="flex flex-col items-center text-[var(--accent)]">
             <ImageIcon className="w-6 h-6" />
             <span className="text-sm mt-1">Galleri</span>
           </Link>
@@ -141,10 +141,10 @@ export default function Gallery() {
             if (e.target === e.currentTarget) setSelectedImage(null);
           }}
         >
-          <div className="relative w-full max-w-lg bg-white rounded-2xl overflow-hidden">
+          <div className="relative w-full max-w-lg bg-[var(--background)] rounded-2xl overflow-hidden">
             {/* Image container */}
             <div 
-              className="w-full aspect-square relative bg-white p-4"
+              className="w-full aspect-square relative bg-[var(--background)] p-4"
               onClick={() => setSelectedImage(null)}
             >
               <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
@@ -178,7 +178,7 @@ export default function Gallery() {
             if (e.target === e.currentTarget) setShowDeleteConfirm(false);
           }}
         >
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+          <div className="bg-[var(--background)] rounded-2xl p-6 w-full max-w-sm">
             <h3 className="text-lg font-semibold mb-2">Slet billede</h3>
             <p className="text-gray-600 mb-6">Er du sikker på, at du vil slette dette billede? Dette kan ikke fortrydes.</p>
             <div className="flex gap-3">

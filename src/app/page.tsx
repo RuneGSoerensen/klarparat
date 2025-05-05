@@ -96,7 +96,7 @@ export default function Home() {
         <button
           key={day}
           onClick={() => handleDateClick(day)}
-          className={`h-14 p-2 flex flex-col items-center w-full bg-white rounded-lg shadow-sm border border-gray-100 ${isToday ? 'bg-[var(--calendar-today)]' : ''} hover:bg-[var(--gallery-bg)] active:bg-[var(--calendar-today)]`}
+          className={`h-14 p-2 flex flex-col items-center w-full rounded-lg shadow-sm border border-gray-100 ${isToday ? 'bg-[var(--calendar-today)]' : ''} hover:bg-[var(--gallery-bg)] active:bg-[var(--calendar-today)]`}
         >
           <span>{day}</span>
           {hasTasks && (

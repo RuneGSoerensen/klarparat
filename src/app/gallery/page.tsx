@@ -100,16 +100,18 @@ export default function Gallery() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)] pb-[72px]">
       {/* Header */}
-      <header className="p-4">
+      <header className="p-4 bg-white border-b flex flex-col items-center">
         <div className="flex items-center gap-2">
           <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
-        <div className="flex items-center gap-2 mt-4">
-          <ImageIcon className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-lg">Galleri</h2>
-        </div>
       </header>
+
+      {/* Section Title - below header, not in white box */}
+      <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
+        <ImageIcon className="w-5 h-5 text-[var(--accent)]" strokeWidth={3} />
+        <h2 className="text-lg font-bold">Galleri</h2>
+      </div>
 
       {/* Gallery Content */}
       <main className="flex-1 p-4 bg-[var(--gallery-bg)]">

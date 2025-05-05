@@ -87,16 +87,18 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="flex-none p-4 border-b">
+      <header className="flex-none p-4 border-b flex flex-col items-center bg-white">
         <div className="flex items-center gap-2">
           <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
-        <div className="flex items-center gap-2 mt-4">
-          <MessageSquare className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-lg">Team Chat</h2>
-        </div>
       </header>
+
+      {/* Page Title - below header, not in white box */}
+      <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
+        <MessageSquare className="w-5 h-5 text-[var(--accent)]" strokeWidth={3} />
+        <h2 className="text-lg font-bold">Team Chat</h2>
+      </div>
 
       {/* Chat Messages */}
       <main 

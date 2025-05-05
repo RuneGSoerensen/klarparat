@@ -47,14 +47,20 @@ export default function Login() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="p-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+      <header className="p-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm flex flex-col items-center">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
-          <Cookie className="w-8 h-8 text-[#C4A484]" />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#C4A484] to-[#B39374] bg-clip-text text-transparent">
+          <Cookie className="w-8 h-8 text-[var(--accent)]" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
             KlarParat
           </h1>
         </div>
       </header>
+
+      {/* Section Title - below header, not in white box */}
+      <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
+        <Cookie className="w-6 h-6 text-[var(--accent)]" strokeWidth={3} />
+        <h2 className="text-lg font-bold">Log ind</h2>
+      </div>
 
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-8">

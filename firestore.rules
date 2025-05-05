@@ -72,6 +72,18 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Gallery collection rules
+    match /gallery/{imageId} {
+      // Anyone authenticated can read images
+      allow read: if isAuthenticated();
+      // Anyone authenticated can upload images
+      allow create: if isAuthenticated();
+      // Only admins can delete images
+      allow delete: if isAdmin();
+      // Only admins can update images (optional, usually not needed)
+      allow update: if isAdmin();
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;

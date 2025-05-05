@@ -2,74 +2,45 @@
 
 import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useUser } from '../../context/UserContext';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Timestamp } from 'firebase/firestore';
 
 interface GalleryImage {
-  src: string;
-  date: string;
+  id: string;
+  url: string;
+  uploadedAt: Timestamp | null;
+  uploaderId: string;
+  uploaderName: string;
+  fileName: string;
 }
-
-const galleryImages: GalleryImage[] = [
-  {
-    src: "/food1.jpg",
-    date: "MAJ 12"
-  },
-  {
-    src: "/food2.jpg",
-    date: "MAJ 12"
-  },
-  {
-    src: "/food3.jpg",
-    date: "MAJ 12"
-  },
-  {
-    src: "/food4.jpg",
-    date: "MAJ 12"
-  },
-  {
-    src: "/food5.jpg",
-    date: "MAJ 11"
-  },
-  {
-    src: "/food6.jpg",
-    date: "MAJ 11"
-  },
-  {
-    src: "/food7.jpg",
-    date: "MAJ 11"
-  },
-  {
-    src: "/food8.jpg",
-    date: "MAJ 11"
-  },
-  {
-    src: "/food9.jpg",
-    date: "MAJ 10"
-  },
-  {
-    src: "/food10.jpg",
-    date: "MAJ 10"
-  },
-  {
-    src: "/food11.jpg",
-    date: "MAJ 10"
-  },
-  {
-    src: "/food12.jpg",
-    date: "MAJ 10"
-  }
-];
 
 export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user } = useUser();
+  const { user, userData } = useUser();
+  const [deleting, setDeleting] = useState(false);
+
+  // Fetch images from Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'gallery'), orderBy('uploadedAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const images: GalleryImage[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as GalleryImage[];
+      setGalleryImages(images);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Step 2: Upload file to Firebase Storage
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +54,16 @@ export default function Gallery() {
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
       console.log('Uploaded file URL:', url);
-      // TODO: Save url and metadata to Firestore in next step
+      // Save url and metadata to Firestore
+      await addDoc(collection(db, 'gallery'), {
+        url,
+        uploadedAt: serverTimestamp(),
+        uploaderId: user.uid,
+        uploaderName: user.displayName || user.email || 'Unknown',
+        fileName: file.name,
+      });
+      setSelectedFile(null); // Clear file after upload
+      alert('Billede uploadet!');
     } catch (err) {
       console.error('Upload failed:', err);
       alert('Upload failed. Please try again.');
@@ -92,10 +72,29 @@ export default function Gallery() {
     }
   };
 
-  const handleDelete = () => {
-    // Here we would implement the actual delete functionality
-    setShowDeleteConfirm(false);
-    setSelectedImage(null);
+  // Delete image (admin only)
+  const handleDeleteImage = async () => {
+    if (!selectedImage) return;
+    setDeleting(true);
+    try {
+      // Delete from Storage
+      // Extract storage path from URL
+      const url = selectedImage.url;
+      const match = url.match(/\/o\/(.+)\?/);
+      const path = match ? decodeURIComponent(match[1]) : null;
+      if (path) {
+        await deleteObject(ref(storage, path));
+      }
+      // Delete Firestore doc
+      await deleteDoc(doc(db, 'gallery', selectedImage.id));
+      setShowDeleteConfirm(false);
+      setSelectedImage(null);
+    } catch (err) {
+      alert('Kunne ikke slette billede. Prøv igen.');
+      console.error('Delete failed:', err);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -115,20 +114,25 @@ export default function Gallery() {
       {/* Gallery Content */}
       <main className="flex-1 p-4 bg-[var(--gallery-bg)]">
         <div className="grid grid-cols-2 gap-4 pb-[72px]">
-          {galleryImages.map((image, index) => (
-            <div 
-              key={index} 
+          {galleryImages.map((image) => (
+            <div
+              key={image.id}
               className="relative rounded-lg overflow-hidden bg-[var(--background)] shadow-sm cursor-pointer active:opacity-90"
               onClick={() => setSelectedImage(image)}
             >
               <div className="aspect-square relative">
-                <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                  <ImageIcon className="w-8 h-8 text-gray-400" />
-                </div>
-                {/* Image would be here when we have actual images */}
+                {image.url ? (
+                  <img src={image.url} alt={image.fileName} className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                    <ImageIcon className="w-8 h-8 text-gray-400" />
+                  </div>
+                )}
               </div>
               <div className="p-2">
-                <span className="text-sm font-medium text-gray-600">{image.date}</span>
+                <span className="text-sm font-medium text-gray-600">
+                  {image.uploadedAt?.toDate ? image.uploadedAt.toDate().toLocaleDateString('da-DK', { month: 'short', day: 'numeric' }).toUpperCase() : ''}
+                </span>
               </div>
             </div>
           ))}
@@ -181,7 +185,7 @@ export default function Gallery() {
 
       {/* Full Screen Image Modal */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 z-50 p-4 flex items-center justify-center"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedImage(null);
@@ -189,28 +193,38 @@ export default function Gallery() {
         >
           <div className="relative w-full max-w-lg bg-[var(--background)] rounded-2xl overflow-hidden">
             {/* Image container */}
-            <div 
+            <div
               className="w-full aspect-square relative bg-[var(--background)] p-4"
               onClick={() => setSelectedImage(null)}
             >
-              <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
-                <ImageIcon className="w-16 h-16 text-gray-400" />
-              </div>
-              {/* Actual image would be here */}
+              {selectedImage.url ? (
+                <img src={selectedImage.url} alt={selectedImage.fileName} className="absolute inset-0 w-full h-full object-contain" />
+              ) : (
+                <div className="absolute inset-0 bg-gray-50 flex items-center justify-center">
+                  <ImageIcon className="w-16 h-16 text-gray-400" />
+                </div>
+              )}
             </div>
 
             {/* Image date and delete button */}
             <div className="p-4 border-t flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600">{selectedImage.date}</span>
-              <button 
-                className="text-red-500 p-1 hover:bg-red-50 rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowDeleteConfirm(true);
-                }}
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              <span className="text-sm font-medium text-gray-600">
+                {selectedImage.uploadedAt?.toDate ? selectedImage.uploadedAt.toDate().toLocaleDateString('da-DK', { month: 'short', day: 'numeric' }).toUpperCase() : ''}
+              </span>
+              {/* Only show delete button for admin */}
+              {userData?.role === 'admin' && (
+                <button
+                  className="text-red-500 p-1 hover:bg-red-50 rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDeleteConfirm(true);
+                  }}
+                  disabled={deleting}
+                  title="Slet billede"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -218,7 +232,7 @@ export default function Gallery() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 z-[60] p-4 flex items-center justify-center"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowDeleteConfirm(false);
@@ -228,17 +242,19 @@ export default function Gallery() {
             <h3 className="text-lg font-semibold mb-2">Slet billede</h3>
             <p className="text-gray-600 mb-6">Er du sikker på, at du vil slette dette billede? Dette kan ikke fortrydes.</p>
             <div className="flex gap-3">
-              <button 
+              <button
                 className="flex-1 py-2 px-4 rounded-full border border-gray-200 text-gray-600"
                 onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
               >
                 Annuller
               </button>
-              <button 
+              <button
                 className="flex-1 py-2 px-4 rounded-full bg-red-500 text-white"
-                onClick={handleDelete}
+                onClick={handleDeleteImage}
+                disabled={deleting}
               >
-                Slet
+                {deleting ? 'Sletter...' : 'Slet'}
               </button>
             </div>
           </div>

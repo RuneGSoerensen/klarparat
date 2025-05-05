@@ -24,7 +24,6 @@ export default function Login() {
       
       // Get user role from Firestore
       const userData = await getUserData(userCredential.user.uid);
-      console.log("User data from Firestore:", userData);
       
       if (userData) {
         // Set role in localStorage for easy access

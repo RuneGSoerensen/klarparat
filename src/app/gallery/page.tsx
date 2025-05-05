@@ -3,6 +3,9 @@
 import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef } from "react";
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useUser } from '../../context/UserContext';
 
 interface GalleryImage {
   src: string;
@@ -64,15 +67,28 @@ export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useUser();
 
-  // Step 1: Handle file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Step 2: Upload file to Firebase Storage
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
-    // For now, just log the file
-    if (file) {
-      console.log('Selected file:', file);
+    if (!file || !user) return;
+    setUploading(true);
+    try {
+      const timestamp = Date.now();
+      const storageRef = ref(storage, `gallery/${user.uid}/${timestamp}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      console.log('Uploaded file URL:', url);
+      // TODO: Save url and metadata to Firestore in next step
+    } catch (err) {
+      console.error('Upload failed:', err);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -124,9 +140,10 @@ export default function Gallery() {
         <button
           className="w-full bg-[var(--accent)] text-white rounded-full py-3 px-4 flex items-center justify-center gap-2"
           onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
         >
           <Camera className="w-5 h-5" />
-          <span>Upload Nyt Billede</span>
+          <span>{uploading ? 'Uploader...' : 'Upload Nyt Billede'}</span>
         </button>
         <input
           ref={fileInputRef}
@@ -136,8 +153,11 @@ export default function Gallery() {
           onChange={handleFileChange}
         />
         {/* Optionally show selected file name for debugging */}
-        {selectedFile && (
+        {selectedFile && !uploading && (
           <div className="mt-2 text-center text-sm text-gray-600">Valgt fil: {selectedFile.name}</div>
+        )}
+        {uploading && (
+          <div className="mt-2 text-center text-sm text-gray-600">Uploader billede...</div>
         )}
       </div>
 

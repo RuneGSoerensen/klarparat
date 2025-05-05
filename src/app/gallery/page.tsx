@@ -2,7 +2,7 @@
 
 import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface GalleryImage {
   src: string;
@@ -63,6 +63,18 @@ const galleryImages: GalleryImage[] = [
 export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Step 1: Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+    // For now, just log the file
+    if (file) {
+      console.log('Selected file:', file);
+    }
+  };
 
   const handleDelete = () => {
     // Here we would implement the actual delete functionality
@@ -109,10 +121,24 @@ export default function Gallery() {
 
       {/* Upload Button */}
       <div className="fixed bottom-[72px] left-0 right-0 p-4 bg-[var(--background)]">
-        <button className="w-full bg-[var(--accent)] text-white rounded-full py-3 px-4 flex items-center justify-center gap-2">
+        <button
+          className="w-full bg-[var(--accent)] text-white rounded-full py-3 px-4 flex items-center justify-center gap-2"
+          onClick={() => fileInputRef.current?.click()}
+        >
           <Camera className="w-5 h-5" />
           <span>Upload Nyt Billede</span>
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        {/* Optionally show selected file name for debugging */}
+        {selectedFile && (
+          <div className="mt-2 text-center text-sm text-gray-600">Valgt fil: {selectedFile.name}</div>
+        )}
       </div>
 
       {/* Bottom Navigation */}

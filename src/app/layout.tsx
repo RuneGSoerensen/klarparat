@@ -30,7 +30,6 @@ export default function RootLayout({
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed in layout:', user?.uid);
       setUser(user);
       setIsLoading(false);
 
@@ -45,14 +44,12 @@ export default function RootLayout({
     return () => unsubscribe();
   }, [pathname, router]);
 
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      router.replace("/login");
-    } catch (error) {
-      console.error('Error signing out:', error);
+  // Log user email to console when user changes
+  useEffect(() => {
+    if (user && user.email) {
+      console.log('Logged in as:', user.email);
     }
-  };
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -68,25 +65,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <UserProvider>
-          {user && (
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                background: '#C4A484',
-                color: 'white',
-                padding: '8px 16px',
-                zIndex: 1000,
-                cursor: 'pointer'
-              }}
-              onClick={handleLogout}
-              title="Click to log out"
-            >
-              Logged in as: <b>{user.email}</b>
-            </div>
-          )}
-        {children}
+          {children}
         </UserProvider>
       </body>
     </html>

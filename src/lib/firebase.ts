@@ -3,16 +3,6 @@ import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from 'firebase/auth';
 
-// Log environment variables (without exposing actual values)
-console.log('Firebase Config:', {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Set' : 'Not Set',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? 'Set' : 'Not Set',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? 'Set' : 'Not Set',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ? 'Set' : 'Not Set',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ? 'Set' : 'Not Set',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ? 'Set' : 'Not Set',
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ? 'Set' : 'Not Set'
-});
 
 const firebaseConfig = {
   apiKey: "AIzaSyAIJVEfT4HYC2RFn5kjNtyqwr7_3jqCZ_Y",

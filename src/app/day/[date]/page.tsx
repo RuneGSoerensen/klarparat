@@ -72,7 +72,6 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
     }
 
     if (!user) {
-      console.log('No authenticated user, redirecting to login');
       router.replace('/login');
       return;
     }

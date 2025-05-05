@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Cookie } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { getUserData } from "@/lib/userManagement";
+import Header from "@/components/Header";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -47,21 +47,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <header className="p-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm flex flex-col items-center">
-        <div className="max-w-7xl mx-auto flex items-center gap-3">
-          <Cookie className="w-8 h-8 text-[var(--accent)]" />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
-            KlarParat
-          </h1>
-        </div>
-      </header>
+      <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
-      {/* Section Title - below header, not in white box */}
-      <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
-        <Cookie className="w-6 h-6 text-[var(--accent)]" strokeWidth={3} />
-        <h2 className="text-lg font-bold">Log ind</h2>
-      </div>
-
+  
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-8">
           <div className="text-center space-y-2">
@@ -81,7 +69,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#C4A484] focus:ring-2 focus:ring-[#C4A484]/20 transition-all duration-200 outline-none"
-                  placeholder="din@email.dk"
+                  placeholder="din@klarparat.dk"
                   required
                 />
               </div>

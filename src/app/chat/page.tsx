@@ -1,11 +1,12 @@
 "use client";
 
-import { MessageSquare, Cookie, Send, Calendar1, Image } from "lucide-react";
+import { MessageSquare, Send, Calendar1, Image } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { useUser } from "@/context/UserContext";
+import Header from "@/components/Header";
 
 interface Message {
   id: string;
@@ -87,12 +88,7 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="flex-none p-4 border-b flex flex-col items-center bg-white">
-        <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[var(--accent)]" />
-          <h1 className="text-xl font-semibold">KlarParat</h1>
-        </div>
-      </header>
+      <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
       {/* Page Title - below header, not in white box */}
       <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">

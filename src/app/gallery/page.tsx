@@ -1,6 +1,6 @@
 "use client";
 
-import { Image as ImageIcon, Cookie, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
+import { Image as ImageIcon, Calendar1, MessageSquare, Camera, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { storage } from '@/lib/firebase';
@@ -9,6 +9,7 @@ import { useUser } from '../../context/UserContext';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Timestamp } from 'firebase/firestore';
+import Header from "@/components/Header";
 
 interface GalleryImage {
   id: string;
@@ -100,12 +101,7 @@ export default function Gallery() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)] pb-[72px]">
       {/* Header */}
-      <header className="p-4 bg-white border-b flex flex-col items-center">
-        <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[var(--accent)]" />
-          <h1 className="text-xl font-semibold">KlarParat</h1>
-        </div>
-      </header>
+      <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
       {/* Section Title - below header, not in white box */}
       <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">

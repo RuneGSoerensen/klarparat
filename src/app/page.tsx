@@ -1,10 +1,11 @@
 "use client";
 
-import { Calendar1, MessageSquare, Image, ChevronLeft, ChevronRight, Cookie } from "lucide-react";
+import { Calendar1, MessageSquare, Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import Header from "@/components/Header";
 
 const monthNames = [
   "Januar", "Februar", "Marts", "April", "Maj", "Juni",
@@ -115,13 +116,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--gallery-bg)] text-[var(--foreground)] pb-[72px]">
-      {/* Header */}
-      <header className="p-4 bg-white border-b flex flex-col items-center">
-        <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[var(--accent)]" />
-          <h1 className="text-xl font-semibold">KlarParat</h1>
-        </div>
-      </header>
+      <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
       {/* Section Title - below header, not in white box */}
       <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
@@ -177,7 +172,7 @@ export default function Home() {
             <span className="text-sm mt-1">Chat</span>
           </Link>
           <Link href="/gallery" className="flex flex-col items-center text-gray-500">
-            <Image className="w-6 h-6" />
+            <ImageIcon className="w-6 h-6" />
             <span className="text-sm mt-1">Galleri</span>
           </Link>
         </div>

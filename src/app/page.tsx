@@ -77,7 +77,7 @@ export default function Home() {
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(
-        <div key={`empty-${i}`} className="h-14 p-2 flex flex-col items-center text-gray-300">
+        <div key={`empty-${i}`} className="h-14 p-2 flex flex-col items-center text-gray-300 bg-white rounded-lg shadow-sm border border-gray-100">
           <span>{getDaysInMonth(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)) - firstDayOfMonth + i + 1}</span>
         </div>
       );
@@ -96,7 +96,7 @@ export default function Home() {
         <button
           key={day}
           onClick={() => handleDateClick(day)}
-          className={`h-14 p-2 flex flex-col items-center w-full ${isToday ? 'bg-[var(--calendar-today)]' : ''} hover:bg-[var(--gallery-bg)] active:bg-[var(--calendar-today)]`}
+          className={`h-14 p-2 flex flex-col items-center w-full bg-white rounded-lg shadow-sm border border-gray-100 ${isToday ? 'bg-[var(--calendar-today)]' : ''} hover:bg-[var(--gallery-bg)] active:bg-[var(--calendar-today)]`}
         >
           <span>{day}</span>
           {hasTasks && (
@@ -114,50 +114,54 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-[72px]">
+    <div className="flex flex-col min-h-screen bg-[var(--gallery-bg)] text-[var(--foreground)] pb-[72px]">
       {/* Header */}
-      <header className="p-4">
+      <header className="p-4 bg-white border-b flex flex-col items-center">
         <div className="flex items-center gap-2">
           <Cookie className="w-6 h-6 text-[var(--accent)]" />
           <h1 className="text-xl font-semibold">KlarParat</h1>
         </div>
-        <div className="flex items-center gap-2 mt-4">
-          <Calendar1 className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-lg">Kalender</h2>
-        </div>
       </header>
 
-      {/* Calendar */}
-      <main className="flex-1 p-4">
-        <div className="flex items-center justify-between mb-6">
-          <button 
-            className="p-2"
-            onClick={handlePreviousMonth}
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <h2 className="text-lg font-medium">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </h2>
-          <button 
-            className="p-2"
-            onClick={handleNextMonth}
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </div>
+      {/* Section Title - below header, not in white box */}
+      <div className="flex items-center gap-2 px-4 py-4 bg-[var(--gallery-bg)]">
+        <Calendar1 className="w-5 h-5 text-[var(--accent)]" strokeWidth={3} />
+        <h2 className="text-lg font-bold">Kalender</h2>
+      </div>
 
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {/* Week days */}
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-            <div key={day + idx} className="h-8 flex items-center justify-center text-sm">
-              {day}
-            </div>
-          ))}
-          
-          {/* Calendar days */}
-          {renderCalendarDays()}
+      {/* Calendar */}
+      <main className="flex-1 p-0">
+        <div className="mx-4 bg-white rounded-xl border-t border-b border-gray-200 shadow-sm p-4">
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              className="p-2"
+              onClick={handlePreviousMonth}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h2 className="text-lg font-medium">
+              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+            </h2>
+            <button 
+              className="p-2"
+              onClick={handleNextMonth}
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {/* Week days */}
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+              <div key={day + idx} className="h-8 flex items-center justify-center text-sm">
+                {day}
+              </div>
+            ))}
+            
+            {/* Calendar days */}
+            {renderCalendarDays()}
+          </div>
         </div>
       </main>
 

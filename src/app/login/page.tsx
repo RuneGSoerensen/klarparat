@@ -47,22 +47,27 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <header className="p-4">
-        <div className="flex items-center gap-2">
-          <Cookie className="w-6 h-6 text-[#C4A484]" />
-          <h1 className="text-xl font-semibold">KlarParat</h1>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <header className="p-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+          <Cookie className="w-8 h-8 text-[#C4A484]" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#C4A484] to-[#B39374] bg-clip-text text-transparent">
+            KlarParat
+          </h1>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
-          <h2 className="text-2xl font-semibold text-center mb-8">Log ind</h2>
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold text-gray-900">Velkommen tilbage</h2>
+            <p className="text-gray-600">Log ind for at fortsætte</p>
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Email
                 </label>
                 <input
@@ -70,13 +75,14 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C4A484] focus:ring-[#C4A484]"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#C4A484] focus:ring-2 focus:ring-[#C4A484]/20 transition-all duration-200 outline-none"
+                  placeholder="din@email.dk"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Adgangskode
                 </label>
                 <input
@@ -84,19 +90,22 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#C4A484] focus:ring-[#C4A484]"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#C4A484] focus:ring-2 focus:ring-[#C4A484]/20 transition-all duration-200 outline-none"
+                  placeholder="••••••••"
                   required
                 />
               </div>
             </div>
 
             {error && (
-              <p className="text-red-500 text-center">{error}</p>
+              <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              </div>
             )}
 
             <button
               type="submit"
-              className="w-full bg-[#C4A484] text-white rounded-lg py-3 hover:bg-[#B39374] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C4A484]"
+              className="w-full bg-[#C4A484] text-white rounded-lg py-3.5 font-medium hover:bg-[#B39374] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C4A484] transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Log ind
             </button>

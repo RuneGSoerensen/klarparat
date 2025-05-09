@@ -148,7 +148,7 @@ export default function Home() {
           {/* Calendar Grid */}
           <div className="grid grid-cols-7 gap-1">
             {/* Week days */}
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+            {['S', 'M', 'T', 'O', 'T', 'F', 'L'].map((day, idx) => (
               <div key={day + idx} className="h-8 flex items-center justify-center text-sm">
                 {day}
               </div>

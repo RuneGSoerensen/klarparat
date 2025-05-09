@@ -135,7 +135,7 @@ export default function Chat() {
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
+            placeholder="Skriv din besked..."
             className="flex-1 p-3 rounded-full border border-[var(--input-border)] focus:outline-none focus:border-[var(--input-focus)]"
           />
           <button 

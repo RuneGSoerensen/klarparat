@@ -1,14 +1,14 @@
 "use client";
 
-import { Calendar1, CheckSquare, Square, Plus, SquareCheckBig, Check } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, useRef, use } from 'react';
+import { useRouter } from 'next/navigation';
+import { createOrUpdateDay } from '@/lib/dayManagement';
+import Header from "@/components/Header";
+import { CheckSquare, Square, Plus, Check } from "lucide-react";
 import { useUser } from '../../../context/UserContext';
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { getAuth } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
-import { createOrUpdateDay } from '@/lib/dayManagement';
 
 interface Task {
   id: string;
@@ -174,19 +174,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-      <header className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <SquareCheckBig className="w-5 h-5 text-[var(--accent)]" />
-            <span className="text-lg">To-do liste</span>
-          </div>
-        </div>
-        <Link href="/" className="text-[var(--accent)] flex flex-col items-center">
-          <Calendar1 className="w-5 h-5" />
-          <span className="text-sm">Kalender</span>
-        </Link>
-      </header>
-
+      <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
       <main className="flex-1 p-4 pb-24">
         <div className="mb-4">
           <h2 className="text-lg">{dayNames[dateObj.getDay()]}, {monthNames[dateObj.getMonth()]} {dateObj.getDate()}</h2>

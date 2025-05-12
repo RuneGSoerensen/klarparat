@@ -173,10 +173,10 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="flex flex-col min-h-screen bg-[var(--gallery-bg)] text-[var(--foreground)]">
       <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
       {/* Section Title and Calendar Back Button */}
-      <div className="flex items-center justify-between px-4 py-4 bg-[var(--background)]">
+      <div className="flex items-center justify-between px-4 py-4 bg-[var(--gallery-bg)]">
         <div className="flex items-center gap-2">
           <CheckSquare className="w-5 h-5 text-[var(--accent)]" strokeWidth={3} />
           <h2 className="text-lg font-bold">To-do liste</h2>
@@ -218,7 +218,7 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
                 className="border rounded p-1 w-20"
               />
             ) : (
-              <span>{guestCount}</span>
+              <span className="text-[var(--accent)]">{guestCount}</span>
             )}
           </div>
         </div>

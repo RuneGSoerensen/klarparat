@@ -10,6 +10,11 @@
   --input-border: #d1d5db; /* gray-300 */
   --input-focus: #C4A484;
   --gallery-bg: #FDF5E6;
+  --error-bg: #FEF2F2;
+  --error-border: #FEE2E2;
+  --error-text: #DC2626;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 @theme inline {

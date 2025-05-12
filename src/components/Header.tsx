@@ -18,7 +18,7 @@ export default function Header({
   title = "KlarParat",
 }: HeaderProps) {
   return (
-    <header className="p-4 bg-white border-b flex flex-col items-center">
+    <header className="p-4 bg-[var(--background)] border-b flex flex-col items-center">
       <div className="flex flex-row items-center gap-2">
         <Image
           src={logoSrc}

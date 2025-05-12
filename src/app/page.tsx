@@ -126,7 +126,7 @@ export default function Home() {
 
       {/* Calendar */}
       <main className="flex-1 p-0">
-        <div className="mx-4 bg-white rounded-xl border-t border-b border-gray-200 shadow-sm p-4">
+        <div className="mx-4 bg-[var(--background)] rounded-xl border-t border-b border-[var(--input-border)] shadow-[var(--shadow)] p-4">
           <div className="flex items-center justify-between mb-6">
             <button 
               className="p-2"
@@ -161,17 +161,17 @@ export default function Home() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t">
+      <nav className="fixed bottom-0 left-0 right-0 bg-[var(--background)] border-t">
         <div className="flex justify-around p-4">
           <Link href="/" className="flex flex-col items-center text-[var(--accent)]">
             <Calendar1 className="w-6 h-6" />
             <span className="text-sm mt-1">Kalender</span>
           </Link>
-          <Link href="/chat" className="flex flex-col items-center text-gray-500">
+          <Link href="/chat" className="flex flex-col items-center text-[var(--foreground)]">
             <MessageSquare className="w-6 h-6" />
             <span className="text-sm mt-1">Chat</span>
           </Link>
-          <Link href="/gallery" className="flex flex-col items-center text-gray-500">
+          <Link href="/gallery" className="flex flex-col items-center text-[var(--foreground)]">
             <ImageIcon className="w-6 h-6" />
             <span className="text-sm mt-1">Galleri</span>
           </Link>

@@ -46,21 +46,20 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="flex flex-col min-h-screen bg-[var(--background)]">
       <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
-  
       <main className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-8">
+        <div className="w-full max-w-md bg-[var(--background)] rounded-2xl shadow-xl p-8 space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900">Velkommen tilbage</h2>
-            <p className="text-gray-600">Log ind for at fortsætte</p>
+            <h2 className="text-3xl font-bold text-[var(--foreground)]">Velkommen tilbage</h2>
+            <p className="text-[var(--foreground)]">Log ind for at forsætte</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
                   Email
                 </label>
                 <input
@@ -68,14 +67,14 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#C4A484] focus:ring-2 focus:ring-[#C4A484]/20 transition-all duration-200 outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-[var(--input-border)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all duration-200 outline-none"
                   placeholder="din@klarparat.dk"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
                   Adgangskode
                 </label>
                 <input
@@ -83,7 +82,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#C4A484] focus:ring-2 focus:ring-[#C4A484]/20 transition-all duration-200 outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-[var(--input-border)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all duration-200 outline-none"
                   placeholder="••••••••"
                   required
                 />
@@ -91,14 +90,14 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                <p className="text-red-600 text-sm text-center">{error}</p>
+              <div className="p-4 rounded-lg bg-[var(--error-bg)] border border-[var(--error-border)]">
+                <p className="text-[var(--error-text)] text-sm text-center">{error}</p>
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full bg-[#C4A484] text-white rounded-lg py-3.5 font-medium hover:bg-[#B39374] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C4A484] transition-all duration-200 shadow-sm hover:shadow-md"
+              className="w-full bg-[var(--accent)] text-white rounded-lg py-3.5 font-medium hover:bg-[var(--accent-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)] transition-all duration-200 shadow-[var(--shadow)] hover:shadow-[var(--shadow-hover)]"
             >
               Log ind
             </button>

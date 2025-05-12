@@ -112,10 +112,10 @@ export default function Chat() {
               >
                 <div className={`flex items-center gap-2 ${ownMessage ? 'flex-row-reverse' : 'flex-row'}`}>
                   <span className="font-medium">{message.sender}</span>
-                  <span className="text-sm text-gray-500">{message.time}</span>
+                  <span className="text-sm text-[var(--foreground)]">{message.time}</span>
                 </div>
                 <div 
-                  className={`p-4 rounded-lg shadow-sm max-w-[80%] bg-[var(--background)]`}
+                  className={`p-4 rounded-lg shadow-[var(--shadow)] max-w-[80%] bg-[var(--background)]`}
                 >
                   <p className="text-[var(--foreground)]">
                     {message.content}
@@ -151,7 +151,7 @@ export default function Chat() {
       {/* Bottom Navigation */}
       <nav className="flex-none border-t bg-[var(--background)]">
         <div className="flex justify-around p-4">
-          <Link href="/" className="flex flex-col items-center text-gray-500">
+          <Link href="/" className="flex flex-col items-center text-[var(--foreground)]">
             <Calendar1 className="w-6 h-6" />
             <span className="text-sm mt-1">Kalender</span>
           </Link>
@@ -159,7 +159,7 @@ export default function Chat() {
             <MessageSquare className="w-6 h-6" />
             <span className="text-sm mt-1">Chat</span>
           </Link>
-          <Link href="/gallery" className="flex flex-col items-center text-gray-500">
+          <Link href="/gallery" className="flex flex-col items-center text-[var(--foreground)]">
             <Image className="w-6 h-6" />
             <span className="text-sm mt-1">Galleri</span>
           </Link>

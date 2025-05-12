@@ -46,7 +46,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[var(--background)]">
+    <div className="flex flex-col min-h-screen bg-[var(--gallery-bg)]">
       <Header logoSrc="/klarparatlogo.png" logoAlt="KlarParat Logo" logoWidth={40} logoHeight={40} logoClassName="h-7 w-auto" title="KlarParat" />
 
       <main className="flex-1 flex items-center justify-center p-6">

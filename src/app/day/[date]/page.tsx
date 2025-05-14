@@ -223,6 +223,8 @@ export default function DayView({ params }: { params: Promise<{ date: string }> 
           </div>
         </div>
 
+        
+
         <div className="mb-6">
           <label className="block text-sm text-gray-600 mb-2">Beskrivelse:</label>
           {isAdmin ? (

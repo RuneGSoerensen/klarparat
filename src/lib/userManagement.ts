@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export type UserRole = 'admin' | 'basic';
 
@@ -10,19 +10,6 @@ export interface UserData {
   role: UserRole;
   createdAt: string;
 }
-
-export const createUserDocument = async (uid: string, email: string, name: string): Promise<void> => {
-  const userRef = doc(db, 'users', uid);
-  const userData: UserData = {
-    uid,
-    email,
-    name,
-    role: 'basic', // Default role
-    createdAt: new Date().toISOString()
-  };
-  
-  await setDoc(userRef, userData);
-};
 
 export const getUserData = async (uid: string): Promise<UserData | null> => {
   const userRef = doc(db, 'users', uid);

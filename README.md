@@ -20,6 +20,6 @@ Designed for a small catering company, to help and aid in their every day planni
 - **Styling:** Tailwind CSS
 - **Backend:** Firebase
 - **Icons:** Lucide React
-- **Development Tools:** ESLint, PostCSS
+- **Development Tools:** ESLint
 
 
